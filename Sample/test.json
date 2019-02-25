@@ -1,0 +1,22 @@
+{
+    "MSG_START_REQ": {
+        "length": 56,
+        "msgType": 1001,
+        "equipId": "\0\0\0\u0001",
+        "phyID": 1,
+        "boardType": 0,
+        "reserve1": 0,
+        "cellReady": 1,
+        "deviceNo": 1,
+        "reserve2": 0,
+        "connType": 0,
+        "tArfModInfo1": { "rat": 0, "validFlag": 1, "ucReserve": "\0\0\0" },
+        "tArfModInfo2": { "rat": 0, "validFlag": 1, "ucReserve": "\0\0\0" },
+        "tEnbAbiList": {
+            "deviceType": 0,
+            "cellNum": 1,
+            "ucReserve": 0,
+            "enbBaseInfo": { "rat": 0, "freqStart": 1, "freqEnd": 8, "freqIndex": 1, "validFlag": 1, "ucReserve": 0 }
+        }
+    }
+}

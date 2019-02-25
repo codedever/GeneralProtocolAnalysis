@@ -1,0 +1,14 @@
+﻿{
+  //流程名称
+  "name": "ipcell",
+  //流程描述
+  "desc": "ipcell设备交互流程",
+  //协议版本号
+  "ver": "v1",
+  "pipelines": [
+    {
+      "req": "",
+      "resp": ""
+    }
+  ]
+}

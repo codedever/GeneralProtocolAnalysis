@@ -1,0 +1,203 @@
+﻿{
+  //协议名称, 全局唯一
+  "name": "ipcell",
+  //协议描述
+  "doc": "ipcell小设备交互协议",
+  //协议版本号
+  "ver": "v1",
+  //协议类型, tcp, udp 等
+  "type": "tcp",
+  "encoding": "utf-8",
+  //协议通用消息头结构
+  "header": {
+    "$id": "0",
+    "name": "header",
+    "doc": "通用协议报文头",
+    "blocks": [
+      {
+        "$id": "1",
+        //size 缺省为1个字节
+        "size": 2,
+        //name 部分必填, 即为隐射字段名 *****
+        "name": "length",
+        //description 为字段说明
+        "doc": "消息体长度"
+      },
+      {
+        "$id": "2",
+        "size": 2,
+        "name": "msgType"
+      },
+      {
+        "$id": "3",
+        "size": 4,
+        "name": "equipId",
+        "type": "string"
+      }
+    ]
+  },
+  //协议报文结构
+  "messages": [
+    {
+      "name": "MSG_START_REQ",
+      "doc": "通信初始化, 注册请求",
+      "blocks": [
+        { "$ref": "1" },
+        { "$ref": "2" },
+        { "$ref": "3" },
+        {
+          //size 缺省为1个字节
+          "size": 4,
+          //name 部分必填, 即为隐射字段名 *****
+          "name": "phyID",
+          //description 为字段说明
+          "doc": "无效"
+        },
+        {
+          "size": 4,
+          "name": "boardType",
+          "doc": "无效"
+        },
+        {
+          "size": 4,
+          "name": "reserve1"
+        },
+        {
+          "size": 1,
+          "name": "cellReady",
+          "doc": "就绪指示"
+        },
+        { "name": "deviceNo" },
+        { "name": "reserve2" },
+        { "name": "connType" },
+        {
+          //以下size为自动计算
+          "name": "tArfModInfo1",
+          "blocks": [
+            {
+              "size": 4,
+              "name": "rat"
+            },
+            { "name": "validFlag" },
+            {
+              "size": 3,
+              "name": "ucReserve"
+            }
+          ]
+        },
+        {
+          "name": "tArfModInfo2",
+          "blocks": [
+            {
+              "size": 4,
+              "name": "rat"
+            },
+            { "name": "validFlag" },
+            {
+              "size": 3,
+              "name": "ucReserve"
+            }
+          ]
+        },
+        {
+          "name": "tEnbAbiList",
+          "blocks": [
+            { "name": "deviceType" },
+            { "name": "cellNum" },
+            {
+              "size": 2,
+              "name": "ucReserve"
+            },
+            {
+              "size": 12,
+              "name": "enbBaseInfo",
+              "blocks": [
+                {
+                  "size": 4,
+                  "name": "rat"
+                },
+                {
+                  "size": 2,
+                  "name": "freqStart"
+                },
+                {
+                  "size": 2,
+                  "name": "freqEnd"
+                },
+                { "name": "freqIndex" },
+                { "name": "validFlag" },
+                {
+                  "size": 2,
+                  "name": "ucReserve"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MSG_START_ACK",
+      "doc": "注册响应",
+      "blocks": [
+        { "$ref": "1" },
+        { "$ref": "2" },
+        { "$ref": "3" },
+        {
+          "size": 4,
+          "name": "uiResult",
+          "doc": "返回结果"
+        }
+      ]
+    },
+    {
+      //此条消息没有消息体
+      "name": "MSG_KEEP_ALIVE_REQ",
+      //心跳消息描述
+      "doc": "心跳请求",
+      "blocks": [
+        { "$ref": "1" },
+        { "$ref": "2" },
+        { "$ref": "3" }
+      ]
+    },
+    {
+      "name": "MSG_KEEP_ALIVE_ACK",
+      "doc": "心跳响应",
+      "blocks": [
+        { "$ref": "1" },
+        { "$ref": "2" },
+        { "$ref": "3" },
+        { "name": "deviceNo" },
+        { "name": "status" }
+      ]
+    },
+    {
+      "name": "MSG_GET_VERSION",
+      "doc": "版本查询",
+      "blocks": [
+        { "$ref": "1" },
+        { "$ref": "2" },
+        { "$ref": "3" }
+      ]
+    },
+    {
+      "name": "MSG_GET_VERSION_ACK",
+      "doc": "版本查询响应",
+      "blocks": [
+        { "$ref": "1" },
+        { "$ref": "2" },
+        { "$ref": "3" },
+        {
+          "size": 4,
+          "name": "result"
+        },
+        {
+          "size": 30,
+          "name": "version",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}

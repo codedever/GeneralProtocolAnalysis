@@ -1,0 +1,7 @@
+#忽略文件夹
+/.vs/
+/.vscode/
+/GeneralProtocolAnalysis/bin/
+/GeneralProtocolAnalysis/obj/
+/Sample/bin/
+/Sample/obj/

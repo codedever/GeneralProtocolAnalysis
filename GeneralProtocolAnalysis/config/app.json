@@ -1,0 +1,12 @@
+﻿{
+  //日志文件夹目录, 日志结构 /config/log/2019-01-01.log
+  "logPath": "/config/log/",
+  //协议文件目录, 目录结构 /config/protocol/ipcell.json
+  "protocolPath": "/config/protocol/",
+  //时间格式, 配置要和 FTP 文件保存格式一致
+  "dateFormat": "yyyy-MM-dd",
+  //全时间格式
+  "dateTimeFormat": "yyyy-MM-dd HH:mm:ss",
+  //全局默认字符编码
+  "defaultEncoding": "utf-8"
+}
