@@ -13,7 +13,7 @@ namespace GeneralProtocolAnalysis
         public string Encoding { get; set; }
         public ProtocolType Type { get; set; }
         public Block Header { get; set; }
-        public List<Block> Messages { get; set; }
+        public List<Message> Messages { get; set; }
 
         public void Init()
         {
@@ -30,6 +30,7 @@ namespace GeneralProtocolAnalysis
 
                     foreach (var message in Messages)
                     {
+                        message.Protocol = this;
                         message.Init();
                     }
                 }
@@ -39,39 +40,51 @@ namespace GeneralProtocolAnalysis
         }
     }
 
-    //public class Message
-    //{
-    //    internal bool Initialized { get; private set; }
-    //    public int Size { get; set; }
-    //    public string Name { get; set; }
-    //    public string Doc { get; set; }
-    //    public Block Header { get; set; }
-    //    public List<Block> Body { get; set; }
+    public class Message
+    {
+        internal bool Initialized { get; private set; }
+        public Protocol Protocol { get; internal set; }
+        public int Size { get; set; }
+        public string Name { get; set; }
+        public string Doc { get; set; }
+        public List<Block> Header { get; set; }
+        public List<Block> Body { get; set; }
+        internal List<Block> Blocks { get; private set; }
 
-    //    internal void Init()
-    //    {
-    //        if (!Initialized)
-    //        {
-    //            if (Header != null)
-    //            {
-    //                Header.Init();
-    //                Size = Header.Size;
-    //            }
+        internal void Init()
+        {
+            if (!Initialized)
+            {
+                if (Header == null && Protocol.Header != null && Protocol.Header.Blocks.IsNotNullOrEmpty())
+                {
+                    Header = Protocol.Header.Blocks.Copy();
+                }
 
-    //            if (Body.IsNotNullOrEmpty())
-    //            {
-    //                foreach (var block in Body)
-    //                {
-    //                    block.Init();
-    //                }
+                if (Header != null)
+                {
+                    foreach (var block in Header)
+                    {
+                        block.Init();
+                    }
 
-    //                Size += Body.Sum(x => x.Size);
-    //            }
+                    Blocks = Header;
+                }
 
-    //            Initialized = true;
-    //        }
-    //    }
-    //}
+                if (Body.IsNotNullOrEmpty())
+                {
+                    foreach (var block in Body)
+                    {
+                        block.Init();
+                    }
+
+                    Blocks.AddRange(Body);
+                }
+
+                Size = Blocks.Sum(x => x.Size);
+                Initialized = true;
+            }
+        }
+    }
 
     public class Block
     {

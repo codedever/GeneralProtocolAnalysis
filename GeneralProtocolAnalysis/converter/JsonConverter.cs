@@ -7,21 +7,31 @@ using System.Text;
 
 namespace GeneralProtocolAnalysis
 {
-    public class JsonConverter : IConverter<Block, string>
+    public class JsonConverter : IMessageConverter<string>
     {
         public JsonConverter(string protocol, string ver = null)
         {
             Protocol = AppSettings.GetProtocol(protocol, ver);
         }
 
+        public JsonConverter(Protocol protocol)
+        {
+            Protocol = protocol;
+        }
+
         public Protocol Protocol { get; private set; }
 
-        public string Encode(Block source, string message = null)
+        public string Encode(Message message)
         {
             try
             {
-                var value = EncodeBlock(source);
-                return value.IsNullOrEmpty() ? null : ("{" + value + "}");
+                var value = new List<string>();
+                foreach (var block in message.Blocks)
+                {
+                    value.Add(EncodeBlock(block));
+                }
+
+                return value.IsNullOrEmpty() ? null : ("{" + string.Join(", ", value) + "}");
             }
             catch (Exception ex)
             {
@@ -29,20 +39,29 @@ namespace GeneralProtocolAnalysis
             }
         }
 
-        public Block Decode(string target, string message)
+        public Message Decode(string target)
         {
-            Block protocolMessage = null;
-            if (message.IsNotNullOrEmpty() && target.IsNotNullOrEmpty())
+            throw new NotImplementedException();
+        }
+
+        public Message Decode(string target, string messageName)
+        {
+            if (target.IsNotNullOrEmpty() && messageName.IsNotNullOrEmpty())
             {
-                var msg = Protocol.Messages.FirstOrDefault(x => x.Name == message);
-                if (msg != null && msg.Size > 0)
+                var message = Protocol.Messages.FirstOrDefault(x => x.Name == messageName);
+                if (message != null && message.Blocks.IsNotNullOrEmpty() && message.Size > 0)
                 {
-                    protocolMessage = msg.Copy();
-                    DecodeBlock(protocolMessage, JToken.Parse(target));
+                    message = message.Copy();
+                    foreach (var block in message.Blocks)
+                    {
+                        DecodeBlock(block, JToken.Parse(target));
+                    }
                 }
+
+                return message;
             }
 
-            return protocolMessage;
+            return null;
         }
 
         private string EncodeBlock(Block block)

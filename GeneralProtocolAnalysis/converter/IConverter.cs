@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace GeneralProtocolAnalysis
 {
     /// <summary>
@@ -11,8 +8,7 @@ namespace GeneralProtocolAnalysis
     /// <typeparam name="TTarget"></typeparam>
     public interface IConverter<TSource, TTarget>
     {
-        Protocol Protocol { get; }
-        TTarget Encode(TSource source, string message = null);
-        TSource Decode(TTarget target, string message = null);
+        TTarget Encode(TSource source);
+        TSource Decode(TTarget target);
     }
 }

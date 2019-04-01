@@ -5,20 +5,34 @@ using System.Text;
 
 namespace GeneralProtocolAnalysis
 {
-    public class BinaryConverter : IConverter<Block, byte[]>
+    public class BinaryConverter : IMessageConverter<byte[]>
     {
-        public BinaryConverter(string protocol, string ver = null)
+        public BinaryConverter(string protocolName, string version = null)
         {
-            Protocol = AppSettings.GetProtocol(protocol, ver);
+            Protocol = AppSettings.GetProtocol(protocolName, version);
         }
 
-        public Protocol Protocol { get; set; }
+        public BinaryConverter(Protocol protocol)
+        {
+            Protocol = protocol;
+        }
 
-        public byte[] Encode(Block source, string message = null)
+        public Protocol Protocol { get; private set; }
+
+        public byte[] Encode(Message source)
         {
             try
             {
-                return EncodeBlock(source);
+                var bytes = new List<byte>();
+                if (source != null && source.Protocol == Protocol && source.Size > 0)
+                {
+                    foreach (var block in source.Blocks)
+                    {
+                        bytes.AddRange(EncodeBlock(block));
+                    }
+                }
+
+                return bytes.ToArray();
             }
             catch (Exception ex)
             {
@@ -26,21 +40,30 @@ namespace GeneralProtocolAnalysis
             }
         }
 
-        public Block Decode(byte[] target, string message)
+        public Message Decode(byte[] target)
         {
-            Block protocolMessage = null;
-            if (message.IsNotNullOrEmpty() && target.IsNotNullOrEmpty())
+            throw new NotImplementedException();
+        }
+
+        public Message Decode(byte[] target, string messageName)
+        {
+            if (target.IsNotNullOrEmpty() && messageName.IsNotNullOrEmpty())
             {
-                var msg = Protocol.Messages.FirstOrDefault(x => x.Name == message);
-                if (msg != null && msg.Size > 0)
+                var message = Protocol.Messages.FirstOrDefault(x => x.Name == messageName);
+                if (message != null && message.Blocks.IsNotNullOrEmpty() && message.Size > 0)
                 {
-                    protocolMessage = msg.Copy();
+                    message = message.Copy();
                     var startIndex = 0;
-                    DecodeBlock(protocolMessage, target, ref startIndex);
+                    foreach (var block in message.Blocks)
+                    {
+                        DecodeBlock(block, target, ref startIndex);
+                    }
                 }
+
+                return message;
             }
 
-            return protocolMessage;
+            return null;
         }
 
         private byte[] EncodeBlock(Block block)

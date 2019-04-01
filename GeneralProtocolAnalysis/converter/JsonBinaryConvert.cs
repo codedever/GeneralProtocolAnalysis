@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GeneralProtocolAnalysis
+﻿namespace GeneralProtocolAnalysis
 {
-    public class JsonBinaryConvert : IConverter<string, byte[]>
+    public class JsonBinaryConvert
     {
         public JsonBinaryConvert(string protocol, string ver = null)
         {
@@ -13,9 +9,16 @@ namespace GeneralProtocolAnalysis
             JsonConverter = new JsonConverter(protocol, ver);
         }
 
+        public JsonBinaryConvert(Protocol protocol)
+        {
+            Protocol = protocol;
+            BinaryConverter = new BinaryConverter(Protocol);
+            JsonConverter = new JsonConverter(protocol);
+        }
+
         public Protocol Protocol { get; private set; }
-        private IConverter<Block, byte[]> BinaryConverter { get; set; }
-        private IConverter<Block, string> JsonConverter { get; set; }
+        private IMessageConverter<byte[]> BinaryConverter { get; set; }
+        private IMessageConverter<string> JsonConverter { get; set; }
 
         /// <summary>
         /// 将 json 字符串编码为字节流
