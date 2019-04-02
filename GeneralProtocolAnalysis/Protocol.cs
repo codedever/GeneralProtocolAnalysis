@@ -49,7 +49,6 @@ namespace GeneralProtocolAnalysis
         public string Doc { get; set; }
         public List<Block> Header { get; set; }
         public List<Block> Body { get; set; }
-        internal List<Block> Blocks { get; private set; }
 
         internal void Init()
         {
@@ -67,7 +66,7 @@ namespace GeneralProtocolAnalysis
                         block.Init();
                     }
 
-                    Blocks = Header;
+                    Size = Header.Sum(x => x.Size);
                 }
 
                 if (Body.IsNotNullOrEmpty())
@@ -77,10 +76,9 @@ namespace GeneralProtocolAnalysis
                         block.Init();
                     }
 
-                    Blocks.AddRange(Body);
+                    Size += Body.Sum(x => x.Size);
                 }
 
-                Size = Blocks.Sum(x => x.Size);
                 Initialized = true;
             }
         }
@@ -94,6 +92,7 @@ namespace GeneralProtocolAnalysis
         }
 
         internal bool Initialized { get; private set; }
+        internal Block Parent { get; private set; }
         public int Size { get; set; }
         public string Name { get; set; }
         public string Doc { get; set; }
@@ -113,9 +112,14 @@ namespace GeneralProtocolAnalysis
                 if (Blocks.IsNotNullOrEmpty())
                 {
                     Size = 0;
-                    Type = TypeCode.Object;
+                    if (Type == TypeCode.Empty)
+                    {
+                        Type = TypeCode.Object;
+                    }
+
                     foreach (var block in Blocks)
                     {
+                        block.Parent = this;
                         block.Init();
                         Size += block.Size;
                     }

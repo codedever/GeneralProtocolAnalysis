@@ -49,12 +49,18 @@ namespace GeneralProtocolAnalysis
             if (target.IsNotNullOrEmpty() && messageName.IsNotNullOrEmpty())
             {
                 var message = Protocol.Messages.FirstOrDefault(x => x.Name == messageName);
-                if (message != null && message.Blocks.IsNotNullOrEmpty() && message.Size > 0)
+                if (message != null && message.Size > 0)
                 {
                     message = message.Copy();
-                    foreach (var block in message.Blocks)
+                    var token = JToken.Parse(target);
+                    foreach (var block in message.Header)
                     {
-                        DecodeBlock(block, JToken.Parse(target));
+                        DecodeBlock(block, token[block.Name]);
+                    }
+
+                    foreach (var block in message.Body)
+                    {
+                        DecodeBlock(block, token[block.Name]);
                     }
                 }
 
@@ -81,8 +87,12 @@ namespace GeneralProtocolAnalysis
                     case TypeCode.Object:
                         if (block.Blocks.IsNotNullOrEmpty())
                         {
-                            value = "\"" + block.Name + "\":{";
-                            //var current = "[";
+                            if (block.Parent.Type == TypeCode.Object)
+                            {
+                                value = "\"" + block.Name + "\":";
+                            }
+
+                            value += "{";
                             for (int i = 0; i < block.Blocks.Count; i++)
                             {
                                 value += EncodeBlock(block.Blocks[i]);
@@ -93,6 +103,27 @@ namespace GeneralProtocolAnalysis
                             }
 
                             value += "}";
+                        }
+                        break;
+                    case TypeCode.Array:
+                        if (block.Blocks.IsNotNullOrEmpty())
+                        {
+                            if (block.Blocks.Select(x => x.Name).Distinct().Count() != 1 || block.Blocks.Select(x => x.Size).Distinct().Count() != 1)
+                            {
+                                throw new Exception($"the protocol message Array type block {block.Name} must have the same name children blocks and size!");
+                            }
+
+                            value = "\"" + block.Name + "\":[";
+                            for (int i = 0; i < block.Blocks.Count; i++)
+                            {
+                                value += EncodeBlock(block.Blocks[i]);
+                                if (i != block.Blocks.Count - 1)
+                                {
+                                    value += ",";
+                                }
+                            }
+
+                            value += "]";
                         }
                         break;
                     case TypeCode.Boolean:
@@ -126,6 +157,7 @@ namespace GeneralProtocolAnalysis
                         block.Value = token[block.Name].Value<DateTime>();
                         break;
                     case TypeCode.Object:
+                    case TypeCode.Array:
                         if (block.Blocks.IsNotNullOrEmpty())
                         {
                             var blockToken = token[block.Name];
@@ -150,12 +182,12 @@ namespace GeneralProtocolAnalysis
                     case TypeCode.UInt32:
                     case TypeCode.Int64:
                     case TypeCode.UInt64:
-                        block.Value = Convert.ChangeType(token[block.Name].Value<long>(), block.Type);
+                        block.Value = Convert.ChangeType(token[block.Name].Value<long>(), (System.TypeCode)block.Type);
                         break;
                     case TypeCode.Single:
                     case TypeCode.Double:
                     case TypeCode.Decimal:
-                        block.Value = Convert.ChangeType(token[block.Name].Value<decimal>(), block.Type);
+                        block.Value = Convert.ChangeType(token[block.Name].Value<decimal>(), (System.TypeCode)block.Type);
                         break;
                     default:
                         break;

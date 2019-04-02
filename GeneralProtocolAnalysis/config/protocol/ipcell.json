@@ -70,31 +70,36 @@
         { "name": "reserve2" },
         { "name": "connType" },
         {
-          //以下size为自动计算
-          "name": "tArfModInfo1",
+          "name": "tArfModInfos",
           "blocks": [
             {
-              "size": 4,
-              "name": "rat"
+              //以下size为自动计算
+              "name": "tArfModInfo",
+              "blocks": [
+                {
+                  "size": 4,
+                  "name": "rat"
+                },
+                { "name": "validFlag" },
+                {
+                  "size": 3,
+                  "name": "ucReserve"
+                }
+              ]
             },
-            { "name": "validFlag" },
             {
-              "size": 3,
-              "name": "ucReserve"
-            }
-          ]
-        },
-        {
-          "name": "tArfModInfo2",
-          "blocks": [
-            {
-              "size": 4,
-              "name": "rat"
-            },
-            { "name": "validFlag" },
-            {
-              "size": 3,
-              "name": "ucReserve"
+              "name": "tArfModInfo",
+              "blocks": [
+                {
+                  "size": 4,
+                  "name": "rat"
+                },
+                { "name": "validFlag" },
+                {
+                  "size": 3,
+                  "name": "ucReserve"
+                }
+              ]
             }
           ]
         },

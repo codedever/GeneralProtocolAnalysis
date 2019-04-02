@@ -26,7 +26,12 @@ namespace GeneralProtocolAnalysis
                 var bytes = new List<byte>();
                 if (source != null && source.Protocol == Protocol && source.Size > 0)
                 {
-                    foreach (var block in source.Blocks)
+                    foreach (var block in source.Header)
+                    {
+                        bytes.AddRange(EncodeBlock(block));
+                    }
+
+                    foreach (var block in source.Body)
                     {
                         bytes.AddRange(EncodeBlock(block));
                     }
@@ -50,11 +55,16 @@ namespace GeneralProtocolAnalysis
             if (target.IsNotNullOrEmpty() && messageName.IsNotNullOrEmpty())
             {
                 var message = Protocol.Messages.FirstOrDefault(x => x.Name == messageName);
-                if (message != null && message.Blocks.IsNotNullOrEmpty() && message.Size > 0)
+                if (message != null && message.Size > 0)
                 {
                     message = message.Copy();
                     var startIndex = 0;
-                    foreach (var block in message.Blocks)
+                    foreach (var block in message.Header)
+                    {
+                        DecodeBlock(block, target, ref startIndex);
+                    }
+
+                    foreach (var block in message.Body)
                     {
                         DecodeBlock(block, target, ref startIndex);
                     }
@@ -176,8 +186,14 @@ namespace GeneralProtocolAnalysis
                             }
                             break;
                         case TypeCode.Object:
+                        case TypeCode.Array:
                             if (block.Blocks.IsNotNullOrEmpty())
                             {
+                                if (block.Type == TypeCode.Array && (block.Blocks.Select(x => x.Name).Distinct().Count() != 1 || block.Blocks.Select(x => x.Size).Distinct().Count() != 1))
+                                {
+                                    throw new Exception($"the protocol message Array type block {block.Name} must have the same name children blocks and size!");
+                                }
+
                                 var list = new List<byte>();
                                 foreach (var x in block.Blocks)
                                 {
@@ -187,7 +203,6 @@ namespace GeneralProtocolAnalysis
                                 bytes = list.ToArray();
                             }
                             break;
-                        case TypeCode.DBNull:
                         case TypeCode.Empty:
                         default:
                             if (block.Size != 0)
@@ -278,15 +293,20 @@ namespace GeneralProtocolAnalysis
                         }
                         break;
                     case TypeCode.Object:
+                    case TypeCode.Array:
                         if (block.Blocks.IsNotNullOrEmpty())
                         {
+                            if (block.Type == TypeCode.Array && (block.Blocks.Select(x => x.Name).Distinct().Count() != 1 || block.Blocks.Select(x => x.Size).Distinct().Count() != 1))
+                            {
+                                throw new Exception($"the protocol message Array type block {block.Name} must have the same name children blocks and size!");
+                            }
+
                             foreach (var x in block.Blocks)
                             {
                                 DecodeBlock(x, bytes, ref startIndex);
                             }
                         }
                         break;
-                    case TypeCode.DBNull:
                     case TypeCode.Empty:
                     default:
                         block.Value = null;

@@ -9,16 +9,18 @@
   "deviceNo": 1,
   "reserve2": 0,
   "connType": 0,
-  "tArfModInfo1": {
-    "rat": 0,
-    "validFlag": 1,
-    "ucReserve": "000"
-  },
-  "tArfModInfo2": {
-    "rat": 0,
-    "validFlag": 1,
-    "ucReserve": "000"
-  },
+  "tArfModInfos": [
+    {
+      "rat": 0,
+      "validFlag": 1,
+      "ucReserve": "000"
+    },
+    {
+      "rat": 0,
+      "validFlag": 1,
+      "ucReserve": "000"
+    }
+  ],
   "tEnbAbiList": {
     "deviceType": 0,
     "cellNum": 1,

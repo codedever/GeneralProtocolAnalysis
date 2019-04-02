@@ -13,14 +13,14 @@ namespace Sample
             try
             {
                 var hexString = "00 38 03 E9 30 30 30 31 00 00 00 01 00 00 00 00 00 00 00 00 01 01 00 00 00 00 00 00 01 30 30 30 00 00 00 00 01 30 30 30 00 01 00 00 00 00 00 00 00 01 00 08 01 01 00 00";
-                var bytes = hexString.ToBinary();
-                var value = bytes.ToHexString();
-                Console.WriteLine(value);
-                Console.WriteLine(value == hexString);
-                Console.WriteLine(protocolName);
-                //JsonBinaryConverterTest(bytes);
+                //var bytes = hexString.ToBinary();
+                //var value = bytes.ToHexString();
+                //Console.WriteLine(value);
+                //Console.WriteLine(value == hexString);
+                Console.WriteLine(hexString);
+                JsonBinaryConverterTest();
                 //Console.WriteLine(JsonConverterTest() == hexString);
-                JsonHexStringConverterTest(hexString);
+                //JsonHexStringConverterTest(hexString);
             }
             catch (Exception ex)
             {
@@ -32,16 +32,7 @@ namespace Sample
             }
         }
 
-        static void JsonBinaryConverterTest(byte[] bytes)
-        {
-            var converter = new JsonBinaryConvert(protocolName);
-            var json = converter.Decode(bytes, messageName);
-            Console.WriteLine(json);
-            var result = converter.Encode(json, messageName);
-            Console.WriteLine(result.ToHexString());
-        }
-
-        static string JsonConverterTest()
+        static string JsonBinaryConverterTest()
         {
             var value = string.Empty;
             var converter = new JsonBinaryConvert(protocolName);
@@ -51,8 +42,11 @@ namespace Sample
                 var bytes = converter.Encode(json, messageName);
                 if (bytes.IsNotNullOrEmpty())
                 {
-                    value = bytes.ToHexString(" ");
+                    value = bytes.ToHexString();
                     Console.WriteLine(value);
+
+                    json = converter.Decode(bytes, messageName);
+                    Console.WriteLine(json);
                 }
             }
 
